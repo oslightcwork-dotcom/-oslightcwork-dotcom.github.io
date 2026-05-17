@@ -5,6 +5,51 @@ const API_URL =
 
 let currentData = null;
 
+let memberMap = {};
+
+
+
+// =====================================
+// 預載全部名單
+// =====================================
+
+function loadMembers(){
+
+  showSuccess("載入名單中...");
+
+  const script =
+  document.createElement("script");
+
+  script.src =
+    API_URL +
+    "?action=getMembers" +
+    "&callback=handleMembers";
+
+  document.body.appendChild(script);
+
+}
+
+
+
+// =====================================
+// 名單回傳
+// =====================================
+
+window.handleMembers = function(data){
+
+  console.log("名單:",data);
+
+  memberMap = data || {};
+
+  showSuccess("名單載入完成");
+
+};
+
+
+
+// 頁面開啟立即載入
+loadMembers();
+
 
 
 // =====================================
@@ -26,7 +71,7 @@ document
 
 
 // =====================================
-// 查詢
+// 查詢（本地瞬間查詢）
 // =====================================
 
 function searchData(){
@@ -47,49 +92,12 @@ function searchData(){
 
   }
 
-  // 查詢中
-  showSuccess("查詢中...");
-
-  // 清除舊JSONP
-  const oldScript =
-  document.getElementById("jsonp");
-
-  if(oldScript){
-
-    oldScript.remove();
-
-  }
-
-  // 建立JSONP
-  const script =
-  document.createElement("script");
-
-  script.id = "jsonp";
-
-  script.src =
-    API_URL +
-    "?action=search" +
-    "&number=" +
-    encodeURIComponent(number) +
-    "&t=" +
-    Date.now() +
-    "&callback=handleResponse";
-
-  document.body.appendChild(script);
-
-}
+  const data =
+  memberMap[number];
 
 
 
-// =====================================
-// 查詢回傳
-// =====================================
-
-window.handleResponse = function(data){
-
-  console.log("查詢結果:",data);
-
-  if(data.success){
+  if(data){
 
     currentData = data;
 
@@ -120,16 +128,11 @@ window.handleResponse = function(data){
 
 
 
-    // =====================================
-    // 按鈕控制
-    // =====================================
-
     const btn =
     document.getElementById("checkinBtn");
 
 
 
-    // 已報到
     if(data.status === "已報到"){
 
       btn.disabled = true;
@@ -138,7 +141,6 @@ window.handleResponse = function(data){
 
     }else{
 
-      // 未報到
       btn.disabled = false;
 
       btn.innerHTML = "確認報到";
@@ -155,7 +157,7 @@ window.handleResponse = function(data){
 
   }
 
-};
+}
 
 
 
@@ -173,7 +175,6 @@ function checkin(){
 
   }
 
-  // 鎖定按鈕避免連點
   const btn =
   document.getElementById("checkinBtn");
 
@@ -181,21 +182,10 @@ function checkin(){
 
   btn.innerHTML = "處理中...";
 
-  // 清除舊JSONP
-  const oldScript =
-  document.getElementById("jsonpCheckin");
 
-  if(oldScript){
 
-    oldScript.remove();
-
-  }
-
-  // 建立JSONP
   const script =
   document.createElement("script");
-
-  script.id = "jsonpCheckin";
 
   script.src =
     API_URL +
@@ -206,8 +196,6 @@ function checkin(){
     encodeURIComponent(currentData.name) +
     "&group=" +
     encodeURIComponent(currentData.group) +
-    "&t=" +
-    Date.now() +
     "&callback=handleCheckin";
 
   document.body.appendChild(script);
@@ -222,26 +210,29 @@ function checkin(){
 
 window.handleCheckin = function(data){
 
-  console.log("報到結果:",data);
-
   const btn =
   document.getElementById("checkinBtn");
 
   if(data.success){
 
-    // 顯示流水號
     document
     .getElementById("showSerial")
     .innerHTML =
     "查詢序號：" + data.serialNumber;
 
-    // 顯示已報到
     document
     .getElementById("showStatus")
     .innerHTML =
     "狀態：已報到";
 
-    // 鎖定按鈕
+
+
+    // 更新本地狀態
+    memberMap[currentData.number].status =
+    "已報到";
+
+
+
     btn.disabled = true;
 
     btn.innerHTML = "已報到";
@@ -278,7 +269,6 @@ function resetForm(){
 
   clearMessage();
 
-  // 鎖定按鈕
   const btn =
   document.getElementById("checkinBtn");
 
