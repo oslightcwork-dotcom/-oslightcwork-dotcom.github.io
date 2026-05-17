@@ -65,7 +65,8 @@ function searchData(){
 
   script.src =
     API_URL +
-    "?number=" +
+    "?action=search" +
+    "&number=" +
     encodeURIComponent(number) +
     "&callback=handleResponse";
 
@@ -81,7 +82,7 @@ function searchData(){
 
 window.handleResponse = function(data){
 
-  console.log(data);
+  console.log("查詢結果:",data);
 
   if(data.success){
 
@@ -130,7 +131,7 @@ window.handleResponse = function(data){
 // 確認報到
 // =====================================
 
-async function checkin(){
+function checkin(){
 
   if(!currentData){
 
@@ -140,59 +141,70 @@ async function checkin(){
 
   }
 
-  try{
+  // 清除舊JSONP
+  const oldScript =
+  document.getElementById("jsonpCheckin");
 
-    const response =
-    await fetch(API_URL,{
+  if(oldScript){
 
-      method:"POST",
-
-      body:JSON.stringify({
-
-        number:currentData.number,
-
-        name:currentData.name,
-
-        group:currentData.group
-
-      })
-
-    });
-
-    const data =
-    await response.json();
-
-    if(data.success){
-
-      // 顯示流水號
-      document
-      .getElementById("showSerial")
-      .innerHTML =
-      "查詢序號：" + data.serialNumber;
-
-      // 顯示狀態
-      document
-      .getElementById("showStatus")
-      .innerHTML =
-      "狀態：已報到";
-
-      showSuccess("報到完成");
-
-    }else{
-
-      showError("報到失敗");
-
-    }
-
-  }catch(error){
-
-    console.error(error);
-
-    showError("寫入失敗");
+    oldScript.remove();
 
   }
 
+  // 建立JSONP
+  const script =
+  document.createElement("script");
+
+  script.id = "jsonpCheckin";
+
+  script.src =
+    API_URL +
+    "?action=checkin" +
+    "&number=" +
+    encodeURIComponent(currentData.number) +
+    "&name=" +
+    encodeURIComponent(currentData.name) +
+    "&group=" +
+    encodeURIComponent(currentData.group) +
+    "&callback=handleCheckin";
+
+  document.body.appendChild(script);
+
 }
+
+
+
+// =====================================
+// 報到回傳
+// =====================================
+
+window.handleCheckin = function(data){
+
+  console.log("報到結果:",data);
+
+  if(data.success){
+
+    // 顯示流水號
+    document
+    .getElementById("showSerial")
+    .innerHTML =
+    "查詢序號：" + data.serialNumber;
+
+    // 顯示已報到
+    document
+    .getElementById("showStatus")
+    .innerHTML =
+    "狀態：已報到";
+
+    showSuccess("報到完成");
+
+  }else{
+
+    showError("報到失敗");
+
+  }
+
+};
 
 
 
