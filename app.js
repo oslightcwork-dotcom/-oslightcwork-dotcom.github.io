@@ -47,6 +47,9 @@ function searchData(){
 
   }
 
+  // 查詢中
+  showSuccess("查詢中...");
+
   // 清除舊JSONP
   const oldScript =
   document.getElementById("jsonp");
@@ -68,6 +71,8 @@ function searchData(){
     "?action=search" +
     "&number=" +
     encodeURIComponent(number) +
+    "&t=" +
+    Date.now() +
     "&callback=handleResponse";
 
   document.body.appendChild(script);
@@ -168,6 +173,14 @@ function checkin(){
 
   }
 
+  // 鎖定按鈕避免連點
+  const btn =
+  document.getElementById("checkinBtn");
+
+  btn.disabled = true;
+
+  btn.innerHTML = "處理中...";
+
   // 清除舊JSONP
   const oldScript =
   document.getElementById("jsonpCheckin");
@@ -193,6 +206,8 @@ function checkin(){
     encodeURIComponent(currentData.name) +
     "&group=" +
     encodeURIComponent(currentData.group) +
+    "&t=" +
+    Date.now() +
     "&callback=handleCheckin";
 
   document.body.appendChild(script);
@@ -209,6 +224,9 @@ window.handleCheckin = function(data){
 
   console.log("報到結果:",data);
 
+  const btn =
+  document.getElementById("checkinBtn");
+
   if(data.success){
 
     // 顯示流水號
@@ -223,12 +241,7 @@ window.handleCheckin = function(data){
     .innerHTML =
     "狀態：已報到";
 
-
-
     // 鎖定按鈕
-    const btn =
-    document.getElementById("checkinBtn");
-
     btn.disabled = true;
 
     btn.innerHTML = "已報到";
@@ -236,6 +249,10 @@ window.handleCheckin = function(data){
     showSuccess("報到完成");
 
   }else{
+
+    btn.disabled = false;
+
+    btn.innerHTML = "確認報到";
 
     showError("報到失敗");
 
@@ -260,8 +277,6 @@ function resetForm(){
   resetData();
 
   clearMessage();
-
-
 
   // 鎖定按鈕
   const btn =
