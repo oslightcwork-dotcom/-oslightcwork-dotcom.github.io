@@ -73,6 +73,19 @@ button{
   font-size:20px;
   font-weight:bold;
   cursor:pointer;
+  transition:.2s;
+}
+
+button:disabled{
+
+  background:#444;
+
+  color:#999;
+
+  cursor:not-allowed;
+
+  opacity:.6;
+
 }
 
 .card{
@@ -128,7 +141,11 @@ button{
       修正
     </button>
 
-    <button onclick="checkin()">
+    <button
+      id="checkinBtn"
+      onclick="checkin()"
+      disabled
+    >
       確認報到
     </button>
 
@@ -163,5 +180,6 @@ button{
 </div>
 
 <script src="app.js?v=20260518"></script>
+
 </body>
 </html>

@@ -113,6 +113,33 @@ window.handleResponse = function(data){
     .innerHTML =
     "狀態：" + data.status;
 
+
+
+    // =====================================
+    // 按鈕控制
+    // =====================================
+
+    const btn =
+    document.getElementById("checkinBtn");
+
+
+
+    // 已報到
+    if(data.status === "已報到"){
+
+      btn.disabled = true;
+
+      btn.innerHTML = "已報到";
+
+    }else{
+
+      // 未報到
+      btn.disabled = false;
+
+      btn.innerHTML = "確認報到";
+
+    }
+
     showSuccess("查詢完成");
 
   }else{
@@ -196,6 +223,16 @@ window.handleCheckin = function(data){
     .innerHTML =
     "狀態：已報到";
 
+
+
+    // 鎖定按鈕
+    const btn =
+    document.getElementById("checkinBtn");
+
+    btn.disabled = true;
+
+    btn.innerHTML = "已報到";
+
     showSuccess("報到完成");
 
   }else{
@@ -223,6 +260,16 @@ function resetForm(){
   resetData();
 
   clearMessage();
+
+
+
+  // 鎖定按鈕
+  const btn =
+  document.getElementById("checkinBtn");
+
+  btn.disabled = true;
+
+  btn.innerHTML = "確認報到";
 
 }
 
