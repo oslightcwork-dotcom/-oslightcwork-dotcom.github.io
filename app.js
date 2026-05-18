@@ -37,8 +37,6 @@ function loadMembers(){
 
 window.handleMembers = function(data){
 
-  console.log("名單:",data);
-
   memberMap = data || {};
 
   showSuccess("名單載入完成");
@@ -47,7 +45,7 @@ window.handleMembers = function(data){
 
 
 
-// 頁面開啟立即載入
+// 啟動載入
 loadMembers();
 
 
@@ -71,7 +69,7 @@ document
 
 
 // =====================================
-// 查詢（本地瞬間查詢）
+// 查詢
 // =====================================
 
 function searchData(){
@@ -213,6 +211,38 @@ window.handleCheckin = function(data){
   const btn =
   document.getElementById("checkinBtn");
 
+
+
+  // 已重複報到
+  if(data.duplicate){
+
+    document
+    .getElementById("showStatus")
+    .innerHTML =
+    "狀態：已報到";
+
+
+
+    memberMap[currentData.number].status =
+    "已報到";
+
+
+
+    btn.disabled = true;
+
+    btn.innerHTML = "已報到";
+
+
+
+    showError("此分機已完成報到");
+
+    return;
+
+  }
+
+
+
+  // 正常成功
   if(data.success){
 
     document
